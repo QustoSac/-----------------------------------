@@ -49,9 +49,11 @@ std::string removeChar(const std::string& filename, char symbol) {
 
 }
 ```
-Компиляция:
+#### Компиляция:
+```
 g++ -fPIC -c mystring.cpp -o mystring.o
 g++ -shared -o libmystring.so mystring.o
+```
 #### 2. Программа main
 
 Файл main.cpp:
@@ -87,9 +89,14 @@ int main() {
     return 0;
 }
 ```
-Компиляция:
+#### Компиляция:
+```
 g++ -o main main.cpp -L. -lmystring
-#### 3. Запуск./main
+```
+#### 3. Запуск
+```
+./main
+```
 Ввод: Введите символ, который хотите удалить из файла input.txt.
 
 Вывод: Программа выведет обработанный текст, в котором удален заданный символ.
