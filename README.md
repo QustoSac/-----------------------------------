@@ -18,7 +18,9 @@
 
 #### 1. Библиотека  libmystring.so
 
-Файл mystring.cpp:#include <string>
+Файл mystring.cpp:
+```
+#include <string>
 #include <fstream>
 #include <iostream>
 
@@ -46,11 +48,14 @@ std::string removeChar(const std::string& filename, char symbol) {
 }
 
 }
+```
 Компиляция:g++ -fPIC -c mystring.cpp -o mystring.o
 g++ -shared -o libmystring.so mystring.o
 #### 2. Программа main
 
-Файл main.cpp:#include <iostream>
+Файл main.cpp:
+```
+#include <iostream>
 #include <dlfcn.h>
 
 int main() {
@@ -80,6 +85,7 @@ int main() {
     dlclose(handle);
     return 0;
 }
+```
 Компиляция:g++ -o main main.cpp -L. -lmystring
 #### 3. Запуск./main
 Ввод: Введите символ, который хотите удалить из файла input.txt.
@@ -91,8 +97,3 @@ int main() {
 * В данном примере функция removeChar удаляет символ из файла. 
 * Вы можете модифицировать mystring.cpp для реализации другой функции обработки файлов.
 * Убедитесь, что файл input.txt находится в той же директории, что и программа main.
-
-### Ресурсы
-
-* [Создание динамических библиотек в Linux](https://www.geeksforgeeks.org/shared-libraries-in-linux/)
-* [Введение в динамические библиотеки](https://en.wikipedia.org/wiki/Dynamic-link_library)
