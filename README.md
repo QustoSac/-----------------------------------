@@ -94,6 +94,5 @@ int main() {
 
 ### Ресурсы
 
-* [Документация по dlopen, dlsym и dlclose](https://www.gnu.org/software/libc/manual/html_node/Dynamic-Loading.html)
 * [Создание динамических библиотек в Linux](https://www.geeksforgeeks.org/shared-libraries-in-linux/)
 * [Введение в динамические библиотеки](https://en.wikipedia.org/wiki/Dynamic-link_library)
