@@ -1,0 +1,9 @@
+Create a DLL library in which to define
+the file processing function in accordance with the task option (design
+the file processing function as a library one).
+The project should provide for the processing of exceptional situations:
+the absence of input parameters, the absence of a processed file,
+the absence of a library file, the absence of a function in the library, errors
+in creating an output file and writing to it.
+To develop a program that uses the file processing function
+from the created DLL.
