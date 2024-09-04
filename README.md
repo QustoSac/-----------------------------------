@@ -1,38 +1,99 @@
-Задание по теме: Динамически подключаемые библиотеки.
-1. Создать библиотеку DLL, в которой определить функцию обработки файла в соответствии с вариантом задания (оформить функцию обработки файла как библиотечную).
-2. Разработать программу, которая использует функцию обработки файла из созданной DLL.
+## Задание по теме: Динамически подключаемые библиотеки
 
+### Цель
 
-В Linux нет понятия .dll, как в Windows. В Linux используются динамически подключаемые библиотеки с расширением .so (Shared Object)  
+1. Создать динамическую библиотеку (в Linux - .so), реализующую функцию обработки файла.
+2. Разработать программу, использующую эту библиотеку для обработки файла.
 
-1. .dll в Windows:
+### Описание
 
-• Понятие: .dll - это файл, содержащий код и ресурсы, которые могут быть загружены и использованы несколькими программами одновременно. 
-• Преимущества:
-  * Экономия памяти: Одна .dll может использоваться многими программами, что сокращает потребление оперативной памяти.
-  * Модульность: Программы можно разбить на модули, что упрощает разработку и поддержку.
-  * Обновление: Можно обновлять только .dll, не перекомпилируя все программы, которые ее используют.
-  * Переносимость: .dll можно использовать на разных версиях Windows.
+В этом задании мы изучим концепцию динамически подключаемых библиотек, которые позволяют:
 
-2. .so в Linux:
+* Модульность: Разбивать программы на отдельные модули, повышая читаемость, удобство разработки и поддержки.
+* Экономия памяти: Общие компоненты могут использоваться многими программами без дублирования кода.
+* Обновление: Можно обновлять библиотеки без необходимости перекомпилировать все программы, использующие их.
+* Переносимость: Библиотеки могут использоваться на разных платформах.
 
-• Понятие: .so - это аналог .dll в Linux. Файл с расширением .so содержит код и данные, которые могут быть загружены в память и использоваться другими программами. 
-• Преимущества: 
-  * То же, что и у .dll: экономия памяти, модульность, обновление, переносимость.
-  * Более гибкая система: Linux использует более гибкую систему связывания библиотек, позволяющую создавать более сложные зависимости.
+### Реализация
 
+#### 1. Библиотека  libmystring.so
 
+Файл mystring.cpp:#include <string>
+#include <fstream>
+#include <iostream>
 
+extern "C" {
 
+std::string removeChar(const std::string& filename, char symbol) {
+    std::ifstream file(filename);
+    std::string content, result;
 
-Компиляция libmystring.so: 
-g++ -fPIC -c mystring.cpp -o mystring.o
+    if (file.is_open()) {
+        while (std::getline(file, content)) {
+            for (char& c : content) {
+                if (c == symbol) {
+                    c = ' '; 
+                }
+            }
+            result += content + "\n";
+        }
+        file.close();
+    } else {
+        std::cerr << "Error opening file: " << filename << std::endl;
+    }
+
+    return result;
+}
+
+}
+Компиляция:g++ -fPIC -c mystring.cpp -o mystring.o
 g++ -shared -o libmystring.so mystring.o
+#### 2. Программа main
 
-Компиляция main:
+Файл main.cpp:#include <iostream>
+#include <dlfcn.h>
 
-g++ -o main main.cpp -L. -lmystring
+int main() {
+    void* handle = dlopen("libmystring.so", RTLD_LAZY);
+    if (!handle) {
+        std::cerr << "Error loading library: " << dlerror() << std::endl;
+        return 1;
+    }
 
+    typedef std::string (*removeChar_t)(const std::string&, char);
+    removeChar_t removeChar = (removeChar_t)dlsym(handle, "removeChar");
+    if (!removeChar) {
+        std::cerr << "Error getting function pointer: " << dlerror() << std::endl;
+        return 1;
+    }
 
-Запуск:
-./main 
+    std::string filename = "input.txt";
+    char symbol;
+
+    std::cout << "Введите символ для замены: ";
+    std::cin >> symbol;
+
+    std::string result = removeChar(filename, symbol);
+
+    std::cout << "Обработанный текст: " << result << std::endl;
+
+    dlclose(handle);
+    return 0;
+}
+Компиляция:g++ -o main main.cpp -L. -lmystring
+#### 3. Запуск./main
+Ввод: Введите символ, который хотите удалить из файла input.txt.
+
+Вывод: Программа выведет обработанный текст, в котором удален заданный символ.
+
+### Дополнительные замечания
+
+* В данном примере функция removeChar удаляет символ из файла. 
+* Вы можете модифицировать mystring.cpp для реализации другой функции обработки файлов.
+* Убедитесь, что файл input.txt находится в той же директории, что и программа main.
+
+### Ресурсы
+
+* [Документация по dlopen, dlsym и dlclose](https://www.gnu.org/software/libc/manual/html_node/Dynamic-Loading.html)
+* [Создание динамических библиотек в Linux](https://www.geeksforgeeks.org/shared-libraries-in-linux/)
+* [Введение в динамические библиотеки](https://en.wikipedia.org/wiki/Dynamic-link_library)
